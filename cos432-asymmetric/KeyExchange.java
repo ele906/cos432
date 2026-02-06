@@ -16,8 +16,12 @@ public class KeyExchange {
     public static final int OUTPUT_SIZE_BYTES = PRF.OUTPUT_SIZE_BYTES;
     public static final int OUTPUT_SIZE_BITS = 8 * OUTPUT_SIZE_BYTES;
 
-    // instance variables
-    // IMPLEMENT THIS
+    private final BigInteger p;
+    private final BigInteger g;
+
+    private final BigInteger x;   // secret exponent
+    private final BigInteger X;   // public g^x mod p
+    private final byte[] outMsg;  // encoded X
 
     /***
      * Prepares to do a key exchange. {@code rand} is a secure pseudorandom generator that can be used by the
@@ -29,8 +33,15 @@ public class KeyExchange {
      * @param iAmServer true iff we are playing the server role in this exchange
      */
     public KeyExchange(PRGen rand, boolean iAmServer) {
-        // IMPLEMENT THIS
-        throw new RuntimeException("Unimplemented.");
+        if (rand == null) throw new IllegalArgumentException("Null PRGen")
+        this.p = DHConstants.p;
+        this.g = DHConstants.g;
+
+        BigInteger tmp = new BigInteger(1, xb);
+        this.x = tmp.mod(p.subtract(BigInteger.TWO)).add(BigInteger.TWO);
+        this.X = g.modPow(x, p);
+
+        this.outMsg = HW2Util.bigIntegerToBytes(X);
     }
 
     /***
@@ -39,8 +50,7 @@ public class KeyExchange {
      * @return digestible message for sending to the other key exchange participant
      */
     public byte[] prepareOutMessage() {
-        // IMPLEMENT THIS
-        throw new RuntimeException("Unimplemented.");
+        return outMsg.clone();
     }
 
     /***
@@ -63,7 +73,15 @@ public class KeyExchange {
      * must be {@code OUTPUT_SIZE_BYTES}.
      */
     public byte[] processInMessage(byte[] inMessage) {
-        // IMPLEMENT THIS
-        throw new RuntimeException("Unimplemented.");
+        if (inMessage == null) throw new NullPointerException("inMessage is null");
+
+        BigInteger Y = new BigInteger(1, inMessage);
+        // validity check -- y should be in [2, p-2]
+        if (Y.compareTo(BigInteger.TWO) < 0) return null;
+        if (Y.compareTo(p.subtract(BigInteger.TWO)) > 0) return null;
+
+        BigInteger S = Y.modPow(this.x, p);
+        byte[] sBytes = HW2Util.bigIntegerToBytes(S);
+        return HashFunction.computeHash(sBytes);
     }
 }

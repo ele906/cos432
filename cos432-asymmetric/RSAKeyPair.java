@@ -6,11 +6,11 @@ import java.math.BigInteger;
 public class RSAKeyPair {
     private RSAKey publicKey;
     private RSAKey privateKey;
-    private BigInteger p;
-    private BigInteger q;
+    private BigInteger P;
+    private BigInteger Q;
 
     private static final BigInteger E = BigInteger.valueOf(65537);
-    private static final int CERTAINTY = 80;
+    private static final int PRIME_CERTAINTY = 80;
     /***
      * Create an RSA key pair.
      *
@@ -23,16 +23,16 @@ public class RSAKeyPair {
 
         while (true) {
 
-            p = new BigInteger(numBits, CERTAINTY, rand);
+            P = new BigInteger(numBits, PRIME_CERTAINTY, rand);
             do {
-                q = new BigInteger(numBits, CERTAINTY, rand);
-            } while (p.equals(q));
+                Q = new BigInteger(numBits, PRIME_CERTAINTY, rand);
+            } while (P.equals(Q));
 
-            BigInteger phi = (p.subtract(BigInteger.ONE)).multiply(q.subtract(BigInteger.ONE));
+            BigInteger phi = (P.subtract(BigInteger.ONE)).multiply(Q.subtract(BigInteger.ONE));
 
             if (!E.gcd(phi).equals(BigInteger.ONE)) continue;
 
-            BigInteger N = p.multiply(q);
+            BigInteger N = P.multiply(Q);
             BigInteger d = E.modInverse(phi);
 
             publicKey = new RSAKey(E, N);
@@ -69,8 +69,6 @@ public class RSAKeyPair {
      * @return two-element array of BigIntegers containing both of the primes used to generate this KeyPair
      */
     public BigInteger[] getPrimes() {
-        BigInteger[] primes = new BigInteger[2];
-        primes[0] = p; primes[1] = q;
-        return primes;
+        return new BigInteger[]{P, Q};
     }
 }
