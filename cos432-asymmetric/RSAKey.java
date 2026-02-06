@@ -8,7 +8,8 @@ import java.math.BigInteger;
 public class RSAKey {
     private BigInteger exponent;
     private BigInteger modulus;
-    private int hLen = 32;
+    private static int H_LEN = 32;
+    private int k;
 
     /***
      * Constructor. Create an RSA key with the given exponent and modulus.
@@ -19,6 +20,7 @@ public class RSAKey {
     public RSAKey(BigInteger theExponent, BigInteger theModulus) {
         exponent = theExponent;
         modulus = theModulus;
+        this.k = (modulus.bitLength() + 7) / 8;
     }
 
     /***
@@ -62,8 +64,10 @@ public class RSAKey {
      * @return padded plaintext of appropriate length for OAEP
      */
     public byte[] addPadding(byte[] input) {
-        int k = (this.modulus.bitLength() + 7) / 8;
-        int L = k - 2 * hLen - 2; int n = input.length;
+        if (input == null) throw new NullPointerException("input is null");
+        int L = k - 2 * H_LEN - 2; int n = input.length;
+
+        assert L >= 4;
         if (n + 4 > L) throw new IllegalArgumentException("Input too long");
 
         byte[] out = new byte[L];
@@ -71,7 +75,7 @@ public class RSAKey {
         out[2] = (byte)(n >>> 8); out[3] = (byte)(n);
 
         for(int i = 0; i < n; i++){
-            out[i+4] = input[4];
+            out[i+4] = input[i];
         }
         return out;
     }
@@ -99,8 +103,22 @@ public class RSAKey {
      * @return plaintext in {@code input} without padding
      */
     public byte[] removePadding(byte[] input) {
-        // IMPLEMENT THIS
-        return null;
+        if (input == null || input.length < 4) {
+            throw new IllegalArgumentException("Bad input");
+        }
+
+        int msgLen = ((input[0] & 0xFF) << 24) | ((input[1] & 0xFF) << 16)
+                | ((input[2] & 0xFF) << 8) | (input[3] & 0xFF);
+
+        if (msgLen < 0 || msgLen > input.length - 4) {
+            throw new IllegalArgumentException("Bad padding");
+        }
+
+        byte[] out = new byte[msgLen];
+        for(int i = 0; i < msgLen; i++){
+            out[i] = input[i+4];
+        }
+        return out;
     }
 
     /***
@@ -128,9 +146,70 @@ public class RSAKey {
      * @return OAEP encoded plaintext
      */
     public byte[] encodeOaep(byte[] input, PRGen prgen) {
-        // IMPLEMENT THIS
-        return null;
+        if (input == null || prgen == null) throw new NullPointerException();
+
+        byte[] lHash = HashFunction.computeHash(new byte[0]);
+        int mLen = input.length;
+        int dbLen = k - H_LEN - 1;
+        int psLen = dbLen - H_LEN - 1 - mLen;
+
+        if (psLen < 0 || dbLen < H_LEN + 1){
+            throw new IllegalArgumentException("invalid pslen");
+        }
+
+        byte[] DB = new byte[dbLen];
+        System.arraycopy(lHash, 0, DB, 0, H_LEN);
+        int clipIndex = H_LEN + psLen;
+        DB[clipIndex] = 0x01;
+        System.arraycopy(input, 0, DB, clipIndex + 1, mLen);
+
+        byte[] seed = new byte[H_LEN];
+        prgen.nextBytes(seed);
+        byte[] dbMask = mgf1(seed, dbLen);
+        byte[] maskedDB = new byte[dbLen];
+        for(int i = 0; i < dbMask.length; i++){
+            maskedDB[i] = (byte)(DB[i] ^ dbMask[i]);
+        }
+
+        byte[] seedMask = mgf1(maskedDB, H_LEN);
+        byte[] maskedSeed = new byte[H_LEN];
+        for (int i = 0; i < H_LEN; i++) {
+            maskedSeed[i] = (byte)(seed[i] ^ seedMask[i]);
+        }
+
+        byte[] EM = new byte[k];
+        EM[0] = 0x00;
+        System.arraycopy(maskedSeed, 0, EM, 1, H_LEN);
+        System.arraycopy(maskedDB, 0, EM, 1 + H_LEN, dbLen);
+        return EM;
     }
+
+    private byte[] mgf1(byte[] seed, int outLen) {
+        if (seed == null) throw new NullPointerException();
+        if (outLen < 0) throw new IllegalArgumentException();
+
+        byte[] out = new byte[outLen];
+        int offset = 0;
+
+        for (int counter = 0; offset < outLen; counter++) {
+            byte[] c = new byte[4];
+            c[0] = (byte)(counter >>> 24); c[1] = (byte)(counter >>> 16);
+            c[2] = (byte)(counter >>> 8); c[3] = (byte)(counter);
+
+            byte[] in = new byte[seed.length + 4];
+            System.arraycopy(seed, 0, in, 0, seed.length);
+            System.arraycopy(c, 0, in, seed.length, 4);
+
+            byte[] h = HashFunction.computeHash(in); // should be H_LEN bytes
+
+            int take = Math.min(h.length, outLen - offset);
+            System.arraycopy(h, 0, out, offset, take);
+            offset += take;
+        }
+
+        return out;
+    }
+
 
     /***
      * Decode an OAEP encoded message back into its plaintext representation. May require padding removal after calling.
