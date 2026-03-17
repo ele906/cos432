@@ -1,0 +1,12 @@
+220 Welcome to SketchyCorp FTP service.
+Name (10.0.53.171:el8403): bob
+331 Please specify the password.
+Password:
+230 Login successful.
+Remote system type is UNIX.
+Using binary mode to transfer files.
+ftp> ls
+227 Entering Passive Mode (10,0,53,171,118,11).
+150 Here comes the directory listing.
+dr-xr-xr-x    2 ftp      ftp            29 Mar 02 21:33 bob
+226 Directory send OK.
