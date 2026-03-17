@@ -37,8 +37,8 @@ arp -an showed both 10.0.0.1 and 10.0.0.2 map to the same MAC, so they are likel
 Mainframe:
 10.0.108.x (x = [93 - 104， 162， 165-167， 169-175， 178-185])
 Identified using nmap -Pn scanning of the subnet. 
-Multiple hosts responded but had all ports filtered, indicating they are protected internal systems (mainframe).
-The mainframe appears as multiple hosts with filtered ports
+"Filtered" ports indicate that packets are being blocked by a firewall, so the presence of a service cannot be confirmed.
+
 
 b. What services are currently running on these machines respectively? On which port is each service running? How did you obtain this information?
 
@@ -49,6 +49,7 @@ determine the state of common service ports.
 On the employee machine (10.0.108.169), I observed that ports 22, 80, and 443 were open, 
 corresponding to SSH, HTTP, and HTTPS services.
 
+"Filtered" ports indicate that packets are being blocked by a firewall, so the presence of a service cannot be confirmed.
 Other ports were "filtered", so we are not sure what exact services are running.
 The filtering indicates that a firewall or packet filter was blocking probes to ports 
 22, 25, 80, 110, 143, 443, 993, 995, 3306, 5432, and 8080.
@@ -57,6 +58,11 @@ The filtering indicates that a firewall or packet filter was blocking probes to 
 
 4. List all of the clients of the company. Briefly explain how you gained access to this client list.
 
+Alan Turing
+Jeff Bezos
+Jen Easterly
+Jim Browning
+Mark Russinovich
 
 ================================================================================
 
