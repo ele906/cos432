@@ -64,6 +64,11 @@ Jen Easterly
 Jim Browning
 Mark Russinovich
 
+At first, I did a scan and looked through the files. I found some suspicious files, such as 
+
+Then I used nmap -sV -p 21,22,111,47923 10.0.108.169 to find that ftp conencts to port 234.
+Then, I used bob's credentials to login. I was able to copy the client_list.
+
 ================================================================================
 
 5. There are unencrypted and encrypted conversations between Alice and Bob.
