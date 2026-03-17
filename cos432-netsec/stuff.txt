@@ -1,3 +1,31 @@
+
+[el8403@ip-10-0-108-169 ~]$ curl -i -u admin:Fa1ZQxsADEULlW0nzitnopX01 http://10.0.53.171:47923/admin/
+HTTP/1.1 200 OK
+Server: nginx/1.12.2
+Date: Tue, 17 Mar 2026 21:21:14 GMT
+Content-Type: text/html
+Content-Length: 527
+Last-Modified: Mon, 02 Mar 2026 21:33:03 GMT
+Connection: keep-alive
+ETag: "69a6020f-20f"
+Accept-Ranges: bytes
+
+<!doctype html>
+<html>
+        <head>
+                <title>Welcome to Sketchy Corp!</title>
+        </head>
+        <body>
+                <p>
+                        You're almost set! Use the following FTP credentials to access your onboarding:
+                </p>
+                <p>
+                        <strong>Username:</strong> <code>bob</code> <br />
+                        <strong>Password:</strong> <code>super-unbruteforceable-sketchycorp-employee-password</code>
+                </p>
+        </body>
+</html>
+
 [el8403@ip-10-0-108-169 ~]$ openssl x509 -in /etc/nginx/sketchy_firewall.crt -text -noout
 Certificate:
     Data:
