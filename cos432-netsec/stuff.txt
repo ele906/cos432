@@ -1,0 +1,212 @@
+
+[el8403@ip-10-0-108-169 ~]$ curl -i -u admin:Fa1ZQxsADEULlW0nzitnopX01 http://10.0.53.171:47923/admin/
+HTTP/1.1 200 OK
+Server: nginx/1.12.2
+Date: Tue, 17 Mar 2026 21:21:14 GMT
+Content-Type: text/html
+Content-Length: 527
+Last-Modified: Mon, 02 Mar 2026 21:33:03 GMT
+Connection: keep-alive
+ETag: "69a6020f-20f"
+Accept-Ranges: bytes
+
+<!doctype html>
+<html>
+        <head>
+                <title>Welcome to Sketchy Corp!</title>
+        </head>
+        <body>
+                <p>
+                        You're almost set! Use the following FTP credentials to access your onboarding:
+                </p>
+                <p>
+                        <strong>Username:</strong> <code>bob</code> <br />
+                        <strong>Password:</strong> <code>super-unbruteforceable-sketchycorp-employee-password</code>
+                </p>
+        </body>
+</html>
+
+[el8403@ip-10-0-108-169 ~]$ openssl x509 -in /etc/nginx/sketchy_firewall.crt -text -noout
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number:
+            36:cf:b1:69:e7:21:00:93:ad:bd:36:cb:ca:7f:44:60:7b:56:00:a0
+    Signature Algorithm: sha256WithRSAEncryption
+        Issuer: C=US, ST=New Jersey, L=Princeton, O=Sketchy Corp
+        Validity
+            Not Before: Jan 14 03:52:47 2022 GMT
+            Not After : Oct 10 03:52:47 2024 GMT
+        Subject: C=US, ST=New Jersey, L=Princeton, O=Sketchy Corp
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                Public-Key: (2048 bit)
+                Modulus:
+                    00:a3:3f:24:7b:fc:7f:ef:cd:ba:b4:80:da:04:87:
+                    28:4c:ab:2a:5a:c3:c6:ed:89:ef:77:27:ad:d4:01:
+                    1b:9e:c3:f4:8f:b6:36:ac:95:53:47:69:fe:a2:8c:
+                    99:ba:c6:51:20:e8:50:33:b7:04:09:0f:1a:f3:06:
+                    e7:7b:47:0e:84:f8:0e:52:fe:9a:dc:01:ae:bc:3c:
+                    8b:1f:aa:09:7b:2c:0d:ff:ab:0f:9e:76:92:db:58:
+                    f4:88:9d:8c:bb:8e:4e:b7:c3:7c:ac:3f:a8:f3:42:
+                    3c:0e:f6:8e:e4:9b:03:4c:b9:d1:1d:73:17:f8:91:
+                    32:24:44:21:b7:52:1f:dd:de:a8:c7:e0:d3:63:51:
+                    a3:4e:76:ff:f7:87:1f:ce:0c:ea:2f:56:11:58:8f:
+                    bb:d3:40:78:b0:44:00:7d:1c:50:77:0b:48:23:a2:
+                    33:b9:1f:f9:67:02:0a:60:27:bd:79:cf:cb:fd:22:
+                    ad:0c:4d:74:f2:15:f1:d3:a2:4e:b6:8f:df:60:65:
+                    d5:1c:e5:4a:e7:6c:63:45:05:71:0e:9e:6e:74:8b:
+                    5f:04:af:4a:a7:1d:47:92:f8:f5:13:6a:03:ed:5d:
+                    40:24:66:a9:2a:e7:ed:06:39:6d:95:05:ba:86:d9:
+                    cf:fe:9e:e8:a4:1a:02:ae:77:6a:81:8f:3b:52:b7:
+                    d1:99
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Subject Key Identifier:
+                DD:1C:67:DB:40:C4:DB:D8:3C:08:E3:DA:D2:42:0C:52:6C:91:DB:F2
+            X509v3 Authority Key Identifier:
+                keyid:DD:1C:67:DB:40:C4:DB:D8:3C:08:E3:DA:D2:42:0C:52:6C:91:DB:F2
+
+            X509v3 Basic Constraints: critical
+                CA:TRUE
+    Signature Algorithm: sha256WithRSAEncryption
+         9e:d2:c9:ad:b2:4e:70:e4:b5:e0:ee:b1:34:3f:31:95:ba:9e:
+         b0:75:1e:f3:77:fb:53:ee:68:63:d2:0b:33:5a:e1:3b:0f:35:
+         e7:8a:cc:9f:8d:66:b4:78:ab:6a:9c:64:f9:75:92:76:61:6e:
+         c7:30:52:a6:28:aa:68:b0:f5:1c:ae:c7:22:26:db:54:1e:68:
+         b2:cb:52:01:63:ce:ed:18:84:b0:63:67:17:84:eb:35:8d:1b:
+         a1:30:ae:09:51:c0:57:27:4b:ef:12:59:de:33:f4:36:a0:3a:
+         40:94:16:8e:8b:0f:af:94:7b:ec:3a:d4:58:af:dc:fa:df:bc:
+         e6:2c:ff:00:5e:d0:b2:55:83:26:55:86:f9:2a:8c:a0:4a:be:
+         6e:7a:9f:4e:7f:f3:a8:8a:bc:24:a7:b8:2c:42:2c:8e:c5:53:
+         fa:09:48:49:99:da:51:68:c9:50:10:e6:3f:7d:b3:d1:19:9f:
+         56:3d:22:6a:f8:14:53:cd:43:df:f0:43:cc:8a:b6:88:01:8f:
+         d2:9c:92:9a:31:03:04:5f:23:1b:50:f2:ed:67:81:cc:85:a2:
+         c0:fc:7d:a0:6c:e6:74:04:df:d3:9e:d9:ec:80:b3:d6:ee:75:
+         d3:16:16:db:28:d5:e1:76:d0:4a:8d:eb:26:e3:57:ef:10:28:
+         84:f4:dd:34
+[el8403@ip-10-0-108-169 ~]$ cat /etc/nginx/nginx.conf.default
+
+#user  nobody;
+worker_processes  1;
+
+#error_log  logs/error.log;
+#error_log  logs/error.log  notice;
+#error_log  logs/error.log  info;
+
+#pid        logs/nginx.pid;
+
+
+events {
+    worker_connections  1024;
+}
+
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    #log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+    #                  '$status $body_bytes_sent "$http_referer" '
+    #                  '"$http_user_agent" "$http_x_forwarded_for"';
+
+    #access_log  logs/access.log  main;
+
+    sendfile        on;
+    #tcp_nopush     on;
+
+    #keepalive_timeout  0;
+    keepalive_timeout  65;
+
+    #gzip  on;
+
+    server {
+        listen       80;
+        server_name  localhost;
+
+        #charset koi8-r;
+
+        #access_log  logs/host.access.log  main;
+
+        location / {
+            root   html;
+            index  index.html index.htm;
+        }
+
+        #error_page  404              /404.html;
+
+        # redirect server error pages to the static page /50x.html
+        #
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   html;
+        }
+
+        # proxy the PHP scripts to Apache listening on 127.0.0.1:80
+        #
+        #location ~ \.php$ {
+        #    proxy_pass   http://127.0.0.1;
+        #}
+
+        # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
+        #
+        #location ~ \.php$ {
+        #    root           html;
+        #    fastcgi_pass   127.0.0.1:9000;
+        #    fastcgi_index  index.php;
+        #    fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;
+        #    include        fastcgi_params;
+        #}
+
+        # deny access to .htaccess files, if Apache's document root
+        # concurs with nginx's one
+        #
+        #location ~ /\.ht {
+        #    deny  all;
+        #}
+    }
+
+
+    # another virtual host using mix of IP-, name-, and port-based configuration
+    #
+    #server {
+    #    listen       8000;
+    #    listen       somename:8080;
+    #    server_name  somename  alias  another.alias;
+
+    #    location / {
+    #        root   html;
+    #        index  index.html index.htm;
+    #    }
+    #}
+
+
+    # HTTPS server
+    #
+    #server {
+    #    listen       443 ssl;
+    #    server_name  localhost;
+
+    #    ssl_certificate      cert.pem;
+    #    ssl_certificate_key  cert.key;
+
+    #    ssl_session_cache    shared:SSL:1m;
+    #    ssl_session_timeout  5m;
+
+    #    ssl_ciphers  HIGH:!aNULL:!MD5;
+    #    ssl_prefer_server_ciphers  on;
+
+    #    location / {
+    #        root   html;
+    #        index  index.html index.htm;
+    #    }
+    #}
+
+}
+[el8403@ip-10-0-108-169 ~]$ find /etc/httpd /etc/nginx /opt /home -type f 2>/dev/null | xargs grep -nH "10.0.53.171\|proxy_test\|Administrators Only\|bob\|admin" 2>/dev/null
+/etc/httpd/conf/httpd.conf:84:# as error documents.  e.g. admin@your-domain.com
+/etc/nginx/nginx.conf:40:        location /proxy_test {
+/etc/nginx/nginx.conf:41:            proxy_pass http://10.0.53.171:47923/admin;
+Binary file /home/el8403/tcpdump matches
+Binary file /home/el8403/nmap matches
+Binary file /home/el8403/ssh matches
