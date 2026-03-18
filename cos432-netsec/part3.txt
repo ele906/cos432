@@ -70,11 +70,18 @@ I tried to ssh through the key and admin, but it failed. It seems like the key d
 
 Then, I tried to curl http://10.0.53.171:47923/admin. I got "401 Unauthorized WWW-Authenticate: Basic realm="Administrators Only"
 
-I decided to sniff traffic with "tcpdump -nn -A -r part4_live.pcap | grep -i authorization" and found Authorization: Basic YWRtaW46RmExWlF4c0FERVVMbFcwbnppdG5vcFgwMQ==
+I noticed the admin pannel is 10.0.53.171:47923.
 
-I decided it with base64 and got admin:Fa1ZQxsADEULlW0nzitnopX01. This is the password to login to the admin panel.
+I decided to sniff traffic with "tcpdump -nn -A -r part4_live.pcap | grep -i authorization" 
+I found Authorization: Basic YWRtaW46RmExWlF4c0FERVVMbFcwbnppdG5vcFgwMQ==
+I decoded it with base64 and got admin:Fa1ZQxsADEULlW0nzitnopX01. 
+This is the password to login to the admin panel.
 
-Then I used nmap -sV -p 21,22,111,47923 10.0.108.169 to find that ftp conencts to port 234. I was able to login to ftp at "ftp 10.0.53.171 234". I used bob's credentials to login. I was able to copy the client_list.
+Then I used nmap -sV -p 21,22,111,47923 10.0.108.169 to find that ftp conencts to port 234. 
+I was able to login to ftp when I wrote in cmd prompt "ftp 10.0.53.171 234". 
+
+I used bob's credentials to login. His password is super-unbruteforceable-sketchycorp-employee-password 
+I was able to copy the client_list. 
 
 ================================================================================
 
