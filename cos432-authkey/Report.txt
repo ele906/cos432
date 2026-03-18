@@ -1,0 +1,30 @@
+Threat 1: Eavesdropping
+
+An adversary who has access to the InsecureChannel traffic could read messages in transit.
+
+Mitigation: After the handshake, all application messages will be encrypted with StreamCipher under a unique symmetric key, so the messages sent over the InsecureChannel do not reveal the plaintext. This helps ensure confidentiality.
+
+Threat 2: Message tampering
+
+An adversary could modify the ciphertext or inject their own messages into the channel.
+
+Mitigation: Messages are protected with authenticated encryption using Encrypt-then-MAC (encKey, macKey). I computed a PRF tag over (nonce || ciphertext) using a MAC key from the session key. The receiver detects tampering by recomputing the tag. They return null if verification fails. This helps ensure integrity.
+
+Threat 3: Replay attacks
+
+An adversary could record a valid encrypted message and replay it later to make the receiver accept the same message again.
+
+Mitigation: Each encrypted message includes an explicit sequence number (seq) inside the authenticated encryption. The receiver checks that the received sequence number equals the next expected value and returns null otherwise. Replayed messages will have an old sequence number, so it will  be rejected.
+
+Threat 4: Man-in-the-middle attack
+
+An adversary could impersonate the server during the initial setup, causing the client to connect to the adversary instead of the real server.
+
+Mitigation: The server signs the DH transcript (clientDH || serverDH) with its RSA private key. The client verifies this signature using the trusted server public key passed into the constructor. This binds the Diffie Hellman Key Exchange to the server. A man in the middle cannot substitute their own Diffie Hellman keys without a valid signature. If verification fails, the client closes the channel.
+
+Threat 5: Long Term RSA Private Key Compromise
+
+If the server's long term private key is compromised, an adversary who has access to past sessions could try to decrypt the message data. This affects Forward Secrecy.
+
+Mitigation: Session keys are calculated from one-time Diffie Hellman values that are never transmitted over the network. Past session keys are not recoverable from the long term RSA private key. The RSA is only used to authenticate the handshake, not to encrypt the session data. Lastly, the close() method overwrites with 0 and nulls the session key when the channel is closed.
+
