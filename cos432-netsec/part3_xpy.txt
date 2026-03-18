@@ -1,0 +1,68 @@
+COS 432 Assignment 4: Network Security
+Part 3: Penetration Testing
+
+
+================================================================================
+
+3. There are three machines in the network, namely the employee, the firewall, and the mainframe.
+
+a. What are their IP addresses, respectively? (If a machine has multiple interfaces, report all IP addresses.) How did you get these addresses?
+
+Employee:
+- 192.168.0.101 (WiFi local network)
+- 10.8.185.117 (VPN interface)
+
+Firewall:
+- 192.168.0.1 (WiFi-facing interface)
+- 10.0.108.169 (internal network interface)
+- 18.189.157.251 (public-facing IP)
+
+Mainframe:
+- 10.0.53.171
+
+I decrypted the WiFi traffic in part3.pcap using the cracked WPA2 password and the SSID (COS432_MegaCorp) in Wireshark's 802.11 decryption settings. The decrypted ARP frames revealed the employee's IPs (10.8.185.117 and 192.168.0.101) and the WiFi gateway (192.168.0.1). The firewall's internal IP (10.0.108.169) was found via `ip addr` after SSH-ing into the firewall, and its public IP (18.189.157.251) was provided as the SSH endpoint. The mainframe's IP (10.0.53.171) was discovered by examining the nginx configuration file (`/etc/nginx/nginx.conf`) on the firewall, which contained a `proxy_pass` directive forwarding traffic to `http://10.0.53.171:47923/admin`.
+
+
+b. What services are currently running on these machines respectively? On which port is each service running? How did you obtain this information?
+
+Firewall (10.0.108.169):
+- SSH (port 22) — OpenSSH 7.4
+- HTTP (port 80) — Apache httpd 2.4.66
+- RPCBind (port 111)
+- HTTPS (port 443) — nginx 1.12.2
+- HTTP (port 47923) — nginx 1.12.2
+- SMTP (port 25) — Postfix (listening on localhost only)
+
+Mainframe (10.0.53.171):
+- SSH (port 22) — OpenSSH 7.4
+- RPCBind (port 111)
+- HTTP (port 47923) — nginx 1.12.2
+
+Employee:
+- Not scannable from the firewall as it is on a separate WiFi/VPN network segment. No open services were observed.
+
+How we obtained this: We ran `nmap -sV localhost` and `nmap -Pn -sV 10.0.108.169` on the firewall to enumerate its services, and `nmap -Pn -sV 10.0.53.171 -p 22,80,443,47923,8080,3306,21,25` to enumerate the mainframe's services.
+
+================================================================================
+
+4. List all of the clients of the company. Briefly explain how you gained access to this client list.
+
+Alan Turing
+Jeff Bezos
+Jen Easterly
+Jim Browning
+Mark Russinovich
+
+First, I examined the nginx configuration file (/etc/nginx/nginx.conf) on the firewall and discovered a proxy_pass directive forwarding requests from /proxy_test to http://10.0.53.171:47923/admin. Since this proxy uses unencrypted HTTP, I used tcpdump -i eth0 -A host 10.0.53.171 on the firewall to capture traffic between the firewall and the mainframe. In the captured packets, I found an HTTP Basic Authentication header (Authorization: Basic YWRtaW46RmExWlF4c0FERVVMbFcwbnppdG5vcFgwMQ==). I decoded this Base64 string to obtain the credentials admin:Fa1ZQxsADEULlW0nzitnopX01. Using these credentials, I accessed the admin page on the mainframe (curl -u admin:Fa1ZQxsADEULlW0nzitnopX01 http://10.0.53.171:47923/admin/), which revealed FTP login credentials — username: bob, password: super-unbruteforceable-sketchycorp-employee-password. I then used nmap -Pn -sV 10.0.53.171 -p 200-300 to discover an FTP service (vsftpd) running on port 234 of the mainframe. I connected via ftp 10.0.53.171 234, logged in with Bob's credentials, navigated to the bob directory, and downloaded the client list file.
+
+================================================================================
+
+5. There are unencrypted and encrypted conversations between Alice and Bob.
+
+a. What does the unencrypted conversation say? Please paste it here and briefly describe how you found and obtained the content.
+
+
+b. (extra credit) Can you decrypt the encrypted messages? If so, what does the plaintext say? Describe how you determined the plaintext contents of the encrypted messages.
+
+
+================================================================================
