@@ -1,0 +1,131 @@
+COS 432 Assignment 4: Network Security
+Part 3: Penetration Testing
+
+================================================================================
+
+1. How many possible Wi-Fi passwords are there that fulfills the password format?
+
+alphanumeric chars:  [a-z,A-Z,0-9] = 26 + 26 + 10 = 62 possibilities
+cos432-XYZ: 62^3
+COS432-XYZ  62^3
+Total* 2 * 62^3 = 476656 passwords
+
+================================================================================
+
+2. What is that actual Wi-Fi password used? How did you obtain that password?
+
+cos432-h4Z
+
+I obtained it by generating a wordlist of all 476,656 possible passwords matching the given format 
+(cos432-XYZ or COS432-XYZ) using python.
+Then I used a linux package aircrack-ng to test those candidates offline against the captured WPA2 handshake 
+in part3.pcap until it found the correct match.
+
+================================================================================
+
+3. There are three machines in the network, namely the employee, the firewall, and the mainframe.
+
+a. What are their IP addresses, respectively? (If a machine has multiple interfaces, report all IP addresses.) How did you get these addresses?
+
+Employee:
+
+18.189.143.110 (public-facing IP)
+10.0.19.17 (internal network interface)
+
+Firewall:
+
+10.0.108.169 (internal network interface)
+18.189.157.251 (public-facing IP)
+
+Mainframe:
+
+10.0.53.171
+
+How we obtained this:
+The firewall's internal IP (10.0.108.169) was found via `ip addr` after SSH-ing into the firewall, and its public IP (18.189.157.251) was provided as the SSH endpoint when we finish question 2. 
+The mainframe's IP (10.0.53.171) was discovered by examining the nginx configuration file (`/etc/nginx/nginx.conf`) on the firewall, which contained a `proxy_pass` directive forwarding traffic to `http://10.0.53.171:47923/admin`. 
+The employee's public IP (18.189.143.110) was discovered by running `tcpdump -i eth0 -n not port 22` on the firewall and observing incoming HTTPS traffic from this IP that triggered a subsequent connection to the mainframe. 
+The employee's internal IP (10.0.19.17) was identified from the system prompt (`bob@ip-10-0-19-17`) after successfully SSH-ing into the employee machine.
+
+b. What services are currently running on these machines respectively? On which port is each service running? How did you obtain this information?
+
+Firewall (10.0.108.169):
+
+Port 22/tcp: ssh (OpenSSH 7.4)
+Port 80/tcp: http (Apache httpd 2.4.66)
+Port 111/tcp: rpcbind (version 2-4)
+Port 443/tcp: http/https (nginx 1.12.2)
+
+Mainframe (10.0.53.171):
+
+Port 22/tcp: ssh (OpenSSH 7.4)
+Port 111/tcp: rpcbind (version 2-4)
+
+Employee (18.189.143.110 / 10.0.19.17):
+
+Port 22/tcp: ssh (OpenSSH 7.4)
+Port 111/tcp: rpcbind (version 2-4)
+
+How we obtained this:
+We obtained this information by logging into the SketchyCorp firewall and running the Nmap network scanner with the service version detection flag (`nmap -sV <IP_address>`) against the IP addresses of all three machines.
+
+
+================================================================================
+
+4. List all of the clients of the company. Briefly explain how you gained access to this client list.
+
+Alan Turing
+Jeff Bezos
+Jen Easterly
+Jim Browning
+Mark Russinovich
+
+At first, I explored the system using nmap and file search. I found sketchy_firewall.key, which is the private RSA key. I found the admin was hosted at 10.0.52.171
+
+I tried to ssh through the key and admin, but it failed. It seems like the key does not work for SSH login.
+
+Then, I tried to curl http://10.0.53.171:47923/admin. I got "401 Unauthorized WWW-Authenticate: Basic realm="Administrators Only"
+
+I noticed the admin pannel is 10.0.53.171:47923.
+
+I decided to sniff traffic with "tcpdump -nn -A -r part4_live.pcap | grep -i authorization" 
+I found Authorization: Basic YWRtaW46RmExWlF4c0FERVVMbFcwbnppdG5vcFgwMQ==
+I decoded it with base64 and got admin:Fa1ZQxsADEULlW0nzitnopX01. 
+This is the password to login to the admin panel.
+
+Then I used nmap -sV -p 21,22,111,47923 10.0.108.169 to find that ftp conencts to port 234. 
+I was able to login to ftp when I wrote in cmd prompt "ftp 10.0.53.171 234". 
+
+I used bob's credentials to login. His password is super-unbruteforceable-sketchycorp-employee-password 
+I was able to copy the client_list. 
+
+================================================================================
+
+5. There are unencrypted and encrypted conversations between Alice and Bob.
+
+a. What does the unencrypted conversation say? Please paste it here and briefly describe how you found and obtained the content.
+
+Unencrypted conversation:
+Alice:  I heard you sold out and took a job at that terrible company...
+Bob:    What do you mean? The only way to change the system is from the inside!
+Alice:  I hope the pay is worth your morals and dignity.
+Bob:    What's that? I can't hear you through my *Airpods*.
+Bob:    I'm getting ad-free, uninterrupted listening with Spotify *Premium*.
+Alice:  You're disgusting. Anyway, make sure to encrypt all of our communications.
+Bob:    Of course! I found this guide that said to use a one time pad.
+Alice:  What do you think they mean by one time?
+Bob:    No idea! Hopefully nothing important.
+
+How we obtained this:
+After identifying the employee machine's IP address (18.189.143.110) in Question 3, we investigated the firewall and discovered Bob's SSH keys (bob.pem and bob.pub) stored in the ~/.ssh/ directory. 
+We then used his private key to authenticate and pivot to the employee machine by running the command ssh -i ~/.ssh/bob.pem bob@18.189.143.110. 
+Upon successfully logging into the employee machine, we found the unencrypted conversation.txt file, along with the encrypted alice.enc and bob.enc files in Bob's home directory.
+
+b. (extra credit) Can you decrypt the encrypted messages? If so, what does the plaintext say? Describe how you determined the plaintext contents of the encrypted messages.
+
+Alice: Why don't you listen to this with your airpods: http://bit.do/CribDragging.
+Bob: I'm so sorry for being so obnoxious last time. Please don't hold it against me
+
+We noticed from Part (a) that Alice and Bob probably used a one time pad. We tried to decode it by xor ing and crib dragging.
+
+================================================================================
