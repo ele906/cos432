@@ -27,32 +27,48 @@ in part3.pcap until it found the correct match.
 
 a. What are their IP addresses, respectively? (If a machine has multiple interfaces, report all IP addresses.) How did you get these addresses?
 
-Employee machine: 10.0.108.169
-ip addr showed my current host IP is 10.0.108.169
+Employee:
 
-Firewall: 10.0.0.1 and 10.0.0.2
-ip route showed the default gateway is 10.0.0.1, which identifies the firewall
-arp -an showed both 10.0.0.1 and 10.0.0.2 map to the same MAC, so they are likely interfaces on the same firewall
+18.189.143.110 (public-facing IP)
+10.0.19.17 (internal network interface)
+
+Firewall:
+
+10.0.108.169 (internal network interface)
+18.189.157.251 (public-facing IP)
 
 Mainframe:
-10.0.108.x (x = [93 - 104， 162， 165-167， 169-175， 178-185])
-Identified using nmap -Pn scanning of the subnet. 
-"Filtered" ports indicate that packets are being blocked by a firewall, so the presence of a service cannot be confirmed.
 
+10.0.53.171
+
+How we obtained this:
+The firewall's internal IP (10.0.108.169) was found via `ip addr` after SSH-ing into the firewall, and its public IP (18.189.157.251) was provided as the SSH endpoint when we finish question 2. 
+The mainframe's IP (10.0.53.171) was discovered by examining the nginx configuration file (`/etc/nginx/nginx.conf`) on the firewall, which contained a `proxy_pass` directive forwarding traffic to `http://10.0.53.171:47923/admin`. 
+The employee's public IP (18.189.143.110) was discovered by running `tcpdump -i eth0 -n not port 22` on the firewall and observing incoming HTTPS traffic from this IP that triggered a subsequent connection to the mainframe. 
+The employee's internal IP (10.0.19.17) was identified from the system prompt (`bob@ip-10-0-19-17`) after successfully SSH-ing into the employee machine.
 
 b. What services are currently running on these machines respectively? On which port is each service running? How did you obtain this information?
 
-I used nmap to perform port scanning and service enumeration on each identified host. 
-I used nmap -Pn to bypass ICMP filtering and identify active hosts, and then used port scanning to 
-determine the state of common service ports.
+Firewall (10.0.108.169):
 
-On the employee machine (10.0.108.169), I observed that ports 22, 80, and 443 were open, 
-corresponding to SSH, HTTP, and HTTPS services.
+Port 22/tcp: ssh (OpenSSH 7.4)
+Port 80/tcp: http (Apache httpd 2.4.66)
+Port 111/tcp: rpcbind (version 2-4)
+Port 443/tcp: http/https (nginx 1.12.2)
 
-"Filtered" ports indicate that packets are being blocked by a firewall, so the presence of a service cannot be confirmed.
-Other ports were "filtered", so we are not sure what exact services are running.
-The filtering indicates that a firewall or packet filter was blocking probes to ports 
-22, 25, 80, 110, 143, 443, 993, 995, 3306, 5432, and 8080.
+Mainframe (10.0.53.171):
+
+Port 22/tcp: ssh (OpenSSH 7.4)
+Port 111/tcp: rpcbind (version 2-4)
+
+Employee (18.189.143.110 / 10.0.19.17):
+
+Port 22/tcp: ssh (OpenSSH 7.4)
+Port 111/tcp: rpcbind (version 2-4)
+
+How we obtained this:
+We obtained this information by logging into the SketchyCorp firewall and running the Nmap network scanner with the service version detection flag (`nmap -sV <IP_address>`) against the IP addresses of all three machines.
+
 
 ================================================================================
 
@@ -89,6 +105,21 @@ I was able to copy the client_list.
 
 a. What does the unencrypted conversation say? Please paste it here and briefly describe how you found and obtained the content.
 
+Unencrypted conversation:
+Alice:  I heard you sold out and took a job at that terrible company...
+Bob:    What do you mean? The only way to change the system is from the inside!
+Alice:  I hope the pay is worth your morals and dignity.
+Bob:    What's that? I can't hear you through my *Airpods*.
+Bob:    I'm getting ad-free, uninterrupted listening with Spotify *Premium*.
+Alice:  You're disgusting. Anyway, make sure to encrypt all of our communications.
+Bob:    Of course! I found this guide that said to use a one time pad.
+Alice:  What do you think they mean by one time?
+Bob:    No idea! Hopefully nothing important.
+
+How we obtained this:
+After identifying the employee machine's IP address (18.189.143.110) in Question 3, we investigated the firewall and discovered Bob's SSH keys (bob.pem and bob.pub) stored in the ~/.ssh/ directory. 
+We then used his private key to authenticate and pivot to the employee machine by running the command ssh -i ~/.ssh/bob.pem bob@18.189.143.110. 
+Upon successfully logging into the employee machine, we found the unencrypted conversation.txt file, along with the encrypted alice.enc and bob.enc files in Bob's home directory.
 
 b. (extra credit) Can you decrypt the encrypted messages? If so, what does the plaintext say? Describe how you determined the plaintext contents of the encrypted messages.
 
