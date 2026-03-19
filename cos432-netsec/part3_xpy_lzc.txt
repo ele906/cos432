@@ -123,9 +123,10 @@ Upon successfully logging into the employee machine, we found the unencrypted co
 
 b. (extra credit) Can you decrypt the encrypted messages? If so, what does the plaintext say? Describe how you determined the plaintext contents of the encrypted messages.
 
-Alice: Why don't you listen to this with your airpods: http://bit.do/CribDragging.
-Bob: I'm so sorry for being so obnoxious last time. Please don't hold it against me
+Alice: Why don't you listen to this with your airpods: http://bit.do/CribDragging. Soon everyone will know you were on 4chan in 2007.
+Bob: I'm so sorry for being so obnoxious last time. Please don't hold it against me or tell anyone my secret. You could get me fired!
 
 We noticed from Part (a) that Alice and Bob probably used a one time pad. We tried to decode it by xor ing and crib dragging.
-
+We used this website to guess common words and find pairs that make sense https://toolbox.lotusfa.com/crib_drag/
+We attended office hours for help as well.
 ================================================================================
