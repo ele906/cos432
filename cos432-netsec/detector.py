@@ -48,7 +48,7 @@ def detect_anomaly(packet_capture):
     all_ips = set(syn_sent) | set(synack_received)
 
     for ip_addr in all_ips:
-        if syn_sent[ip_addr] > 3 * synack_received[ip_addr]:
+        if syn_sent[ip_addr] > 0 and syn_sent[ip_addr] > 3 * synack_received[ip_addr]:
             res.append(ip_addr)
 
     print(res)
