@@ -1,11 +1,20 @@
-<<<<<<< HEAD
 Assignment 5: Web Security (Group Assignment)
 
 Part 4. Writeup: Better Defenses
 
 1. SQL Injection
 
-[paragraph]
+The vulnerability in all four SQL injection targets was the direct insertion of user-supplied input into SQL query strings. 
+
+In sqlinject0, a simple OR '1'='1 payload bypassed authentication. 
+In sqlinject1, escaping single quotes was defeated using a backslash to consume the escape character. 
+In sqlinject2, even MD5 hashing provided no protection because raw binary output was inserted directly into the query, 
+allowing brute-forced inputs whose hash bytes contained injectable SQL. 
+In sqlinject3, blind injection allowed full database enumeration character by character despite no direct output. 
+
+The correct defense against all of these attacks is to use parameterized queries instead of string concatenation.
+This ensures user input is always treated as data, never as SQL code.
+Additionally, database permissions should follow the principle of least privilege, limiting what damage an injection can do even if one occurs.
 
 2. Cross-site Request Forgery (CSRF)
 
@@ -14,20 +23,3 @@ Part 4. Writeup: Better Defenses
 3. Cross-site Scripting (XSS)
 
 [paragraph]
-=======
-Assignment 5: Web Security (Group Assignment)
-
-Part 4. Writeup: Better Defenses
-
-1. SQL Injection
-
-[paragraph]
-
-2. Cross-site Request Forgery (CSRF)
-
-[paragraph]
-
-3. Cross-site Scripting (XSS)
-
-[paragraph]
->>>>>>> c1902fd6a569fb30599f9ad7b72d1d55368ee0b6
