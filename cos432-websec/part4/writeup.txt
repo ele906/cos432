@@ -1,0 +1,15 @@
+Assignment 5: Web Security (Group Assignment)
+
+Part 4. Writeup: Better Defenses
+
+1. SQL Injection
+
+[paragraph]
+
+2. Cross-site Request Forgery (CSRF)
+
+[paragraph]
+
+3. Cross-site Scripting (XSS)
+
+[paragraph]

@@ -1,0 +1,4 @@
+Login successful! (victim' OR '1'='1)
+
+Username: victim' OR '1'='1
+Password: anything (x, 1234, goose, etc)
