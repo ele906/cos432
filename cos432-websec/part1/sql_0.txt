@@ -1,1 +1,8 @@
+<<<<<<< HEAD
 Login successful! (victim' OR '1'='1)
+=======
+Login successful! (victim' OR '1'='1)
+
+Username: victim' OR '1'='1
+Password: anything (x, 1234, goose, etc)
+>>>>>>> c1902fd6a569fb30599f9ad7b72d1d55368ee0b6

