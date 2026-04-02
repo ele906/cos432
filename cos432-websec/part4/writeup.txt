@@ -17,9 +17,9 @@ allowing brute-forced inputs whose hash bytes contained injectable SQL.
 
 In sqlinject3, blind injection allowed full database enumeration character by character despite no direct output. 
 
-The correct defense against all of these attacks is to use parameterized queries instead of string concatenation.
-This ensures user input is always treated as data, never as SQL code.
-Additionally, database permissions should follow the principle of least privilege, limiting what damage an injection can do even if one occurs.
+The correct defense against all of these attacks is to use parameterized queries (prepared statements) instead of string concatenation. 
+This ensures user input is always treated as data strings, never as SQL code.
+Using SQLAlchemy also prevents this problem.
 
 2. Cross-site Request Forgery (CSRF)
 
