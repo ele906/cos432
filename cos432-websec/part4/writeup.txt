@@ -53,6 +53,6 @@ When xssdefense=2 (Remove several tags): The filter relies on an incomplete blac
 When xssdefense=3 (Remove some punctuation): Stripping quotes and semicolons is ineffective because attackers can use template literals (backticks) for strings and rely on JavaScript’s automatic semicolon insertion for logic flow.
 
 To properly defend against XSS, the developers should use the built-in security mechanisms of the Bottle framework that would provide a more consistent and reliable layer of protection, rather than custom manual filters.
-For example, developers should implement context-aware output encoding, which converts characters like `<` and `>` into safe HTML entities (e.g., `&lt;` and `&gt;`) before they are rendered. 
+We can sanitize outgoing strings for context-aware output encoding. For example, html.escape() converts characters like `<` and `>` into safe HTML entities (e.g., `&lt;` and `&gt;`) before they are rendered. 
 Moreover, a strict Content Security Policy should be enforced to disable inline scripts and restrict the domains from which scripts can be loaded. 
 
